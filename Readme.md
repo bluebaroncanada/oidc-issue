@@ -1,7 +1,8 @@
 git clone https://github.com/panva/node-oidc-provider.git
 
-client config in example/support/configuration.js
+client config in `example/support/configuration.js`
 
+```
 {
   client_id: 'oidcCLIENT',
   token_endpoint_auth_method: 'none',
@@ -9,6 +10,7 @@ client config in example/support/configuration.js
   redirect_uris: ['http://localhost:4200/'],
   post_logout_redirect_uris: ['http://localhost:4200/'],
 }
+```
 
 Replace default CORS in `defaults.js`
 
