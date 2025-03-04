@@ -1,0 +1,10 @@
+<main class="main">
+  <div class="content">
+    <button (click)="login()">Login</button>
+    <button (click)="logout()">Logout</button>
+    <button (click)="getWeather()">Get Weather</button>
+    <ng-container *ngIf="userData">
+      <p>{{ userData.given_name }} {{ userData.family_name }}</p>
+    </ng-container>
+  </div>
+</main>
