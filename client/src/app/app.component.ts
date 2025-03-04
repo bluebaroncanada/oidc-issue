@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import {LoginResponse, OidcSecurityService} from "angular-auth-oidc-client";
 import {CommonModule} from "@angular/common";
-import {HttpClient, HttpResponse} from "@angular/common/http";
+import {HttpClient, HttpHeaders, HttpResponse} from "@angular/common/http";
 
 @Component({
   selector: 'app-root',
@@ -14,6 +14,8 @@ import {HttpClient, HttpResponse} from "@angular/common/http";
 export class AppComponent implements OnInit {
   title = 'client';
   userData: any = null;
+  token: string = '';
+  headers!: HttpHeaders;
 
   constructor(private oidc: OidcSecurityService, private httpClient: HttpClient) {
   }
@@ -22,15 +24,21 @@ export class AppComponent implements OnInit {
     this.oidc
       .checkAuth()
       .subscribe((loginResponse: LoginResponse) => {
-        const { isAuthenticated, userData, accessToken, idToken, configId } =
+        const {isAuthenticated, userData, accessToken, idToken, configId} =
           loginResponse;
         console.log(userData);
         this.userData = userData;
       });
+
+    const token = this.oidc.getAccessToken().subscribe((token) => {
+      this.headers = new HttpHeaders({
+        Authorization: 'Bearer ' + token,
+      });
+    });
   }
 
   getWeather() {
-    this.httpClient.get('http://localhost:5000/WeatherForecast').subscribe((response: any) => {
+    this.httpClient.get('http://localhost:5000/WeatherForecast', {headers: this.headers}).subscribe((response: any) => {
       console.log(response);
     })
   }
