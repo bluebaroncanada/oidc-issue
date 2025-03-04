@@ -1,7 +1,8 @@
 git clone https://github.com/panva/node-oidc-provider.git
 
-client config in example/support/configuration.js
+client config in `example/support/configuration.js`
 
+```
 {
   client_id: 'oidcCLIENT',
   token_endpoint_auth_method: 'none',
@@ -9,6 +10,7 @@ client config in example/support/configuration.js
   redirect_uris: ['http://localhost:4200/'],
   post_logout_redirect_uris: ['http://localhost:4200/'],
 }
+```
 
 Replace default CORS in `defaults.js`
 
@@ -58,11 +60,13 @@ Modify the `auth.config.ts`
 authority: 'http://localhost:3000',
 redirectUrl: window.location.origin,
 postLogoutRedirectUri: window.location.origin,
-clientId: '',
-scope: 'profile',
+clientId: 'oidcCLIENT',
+scope: 'openid profile',
 responseType: 'code',
 silentRenew: true,
 silentRenewUrl: window.location.origin + '/silent-renew.html',
+renewTimeBeforeTokenExpiresInSeconds: 10,
+secureRoutes: ['http://localhost:5000/',],
 ```
 
 Add `provideHttpClient()` to `app.config.ts` `providers`
@@ -96,11 +100,39 @@ Add `provideHttpClient()` to `app.config.ts` `providers`
 `app.component.html`  This works and shows the users first and last name after login
 
 ```
+<pre>
 <button (click)="getWeather()">Get Weather</button>
 <ng-container *ngIf="userData">
   <p>{{ userData.given_name }} {{ userData.family_name }}</p>
 </ng-container>
+</pre>
 ```	
 
+# API .Net Core 8 setup
+
+```
+builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme).AddOpenIdConnect(options =>
+{
+    options.Authority = "http://localhost:3000";
+    options.RequireHttpsMetadata = false;
+    options.ClientId = "oidcCLIENT";
+    options.GetClaimsFromUserInfoEndpoint = true;
+});
+
+builder.Services.AddAuthentication(BearerTokenDefaults.AuthenticationScheme).AddBearerToken(options =>
+{
+    options.ClaimsIssuer = "http://localhost:3000";
+});
+
+app.UseCors(options =>
+{
+    options.AllowAnyHeader();
+    options.AllowAnyOrigin();
+    options.AllowAnyMethod();
+});
+
+app.UseAuthentication();
+app.UseAuthorization();
+```
 
 
