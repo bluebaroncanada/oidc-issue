@@ -58,11 +58,13 @@ Modify the `auth.config.ts`
 authority: 'http://localhost:3000',
 redirectUrl: window.location.origin,
 postLogoutRedirectUri: window.location.origin,
-clientId: '',
-scope: 'profile',
+clientId: 'oidcCLIENT',
+scope: 'openid profile',
 responseType: 'code',
 silentRenew: true,
 silentRenewUrl: window.location.origin + '/silent-renew.html',
+renewTimeBeforeTokenExpiresInSeconds: 10,
+secureRoutes: ['http://localhost:5000/',],
 ```
 
 Add `provideHttpClient()` to `app.config.ts` `providers`
@@ -96,10 +98,12 @@ Add `provideHttpClient()` to `app.config.ts` `providers`
 `app.component.html`  This works and shows the users first and last name after login
 
 ```
+<pre>
 <button (click)="getWeather()">Get Weather</button>
 <ng-container *ngIf="userData">
   <p>{{ userData.given_name }} {{ userData.family_name }}</p>
 </ng-container>
+</pre>
 ```	
 
 
