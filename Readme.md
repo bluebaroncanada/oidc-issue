@@ -139,26 +139,16 @@ Add `provideHttpClient()` to `app.config.ts` `providers`
 `app.component.ts`
 
 ```
-  userData: any = null;
-
-  constructor(private oidc: OidcSecurityService, private httpClient: HttpClient) {
-  }
-
-  ngOnInit() {
-    this.oidc
-      .checkAuth()
-      .subscribe((loginResponse: LoginResponse) => {
-        const { isAuthenticated, userData, accessToken, idToken, configId } =
-          loginResponse;
-        console.log(userData);
-        this.userData = userData;
-      });
-  }
-
   getWeather() {
-    this.httpClient.get('http://localhost:5000/WeatherForecast').subscribe((response: any) => {
-      console.log(response);
-    })
+
+    const token = this.oidc.getAccessToken().subscribe((token) => {
+      this.headers = new HttpHeaders({
+        Authorization: 'Bearer ' + token,
+      });
+      this.httpClient.get('http://localhost:5000/WeatherForecast', {headers: this.headers}).subscribe((response: any) => {
+        console.log(response);
+      })
+    });
   }
 ```
 
