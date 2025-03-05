@@ -29,18 +29,18 @@ export class AppComponent implements OnInit {
         console.log(userData);
         this.userData = userData;
       });
+  }
+
+  getWeather() {
 
     const token = this.oidc.getAccessToken().subscribe((token) => {
       this.headers = new HttpHeaders({
         Authorization: 'Bearer ' + token,
       });
+      this.httpClient.get('http://localhost:5000/WeatherForecast', {headers: this.headers}).subscribe((response: any) => {
+        console.log(response);
+      })
     });
-  }
-
-  getWeather() {
-    this.httpClient.get('http://localhost:5000/WeatherForecast', {headers: this.headers}).subscribe((response: any) => {
-      console.log(response);
-    })
   }
 
   login() {
