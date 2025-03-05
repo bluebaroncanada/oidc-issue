@@ -8,14 +8,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 
-builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme).AddOpenIdConnect(options =>
-{
-    options.Authority = "http://localhost:3000";
-    options.RequireHttpsMetadata = false;
-    options.ClientId = "oidcCLIENT";
-    options.GetClaimsFromUserInfoEndpoint = true;
-});
-
 builder.Services.AddAuthentication(BearerTokenDefaults.AuthenticationScheme).AddBearerToken(options =>
 {
     options.ClaimsIssuer = "http://localhost:3000";
