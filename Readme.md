@@ -19,7 +19,7 @@ dotnet run
 
 # The two files that matter
 
-All that should matters is the `node-oidc-provider/example/support/configuration.js` and `api/Program.cs` files.  For the client config look at `client/src/app/auth.config.ts` and `client/src/app/app.component.ts`.
+All that should matter is the `node-oidc-provider/example/support/configuration.js` and `api/Program.cs` files.  For the client config look at `client/src/app/auth.config.ts` and `client/src/app/app.component.ts`.
 
 ```
 builder.Services.AddAuthentication(BearerTokenDefaults.AuthenticationScheme).AddBearerToken(options =>
