@@ -21,11 +21,23 @@ dotnet run
 
 All that should matter is the `node-oidc-provider/example/support/configuration.js` and `api/Program.cs` files.  For the client config look at `client/src/app/auth.config.ts` and `client/src/app/app.component.ts`.
 
+`Program.cs`
 ```
 builder.Services.AddAuthentication(BearerTokenDefaults.AuthenticationScheme).AddBearerToken(options =>
 {
     options.ClaimsIssuer = "http://localhost:3000";
 });
+```
+`configuration.js`
+```
+  clients: [
+{
+  client_id: 'oidcCLIENT',
+  token_endpoint_auth_method: 'none',
+  grant_types: ['refresh_token', 'authorization_code'],
+  redirect_uris: ['http://localhost:4200/'],
+  post_logout_redirect_uris: ['http://localhost:4200/'],
+}
 ```
 
 # Instructions
