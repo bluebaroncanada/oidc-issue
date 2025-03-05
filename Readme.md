@@ -1,3 +1,24 @@
+# How to run
+
+in the node-oidc-provider/example directory
+```
+node koa.js
+```
+
+in the client folder
+```
+npm i
+ng start
+```
+
+in the api folder
+```
+dotnet restore
+dotnet run
+```
+
+# What I've done
+
 git clone https://github.com/panva/node-oidc-provider.git
 
 client config in `example/support/configuration.js`
