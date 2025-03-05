@@ -17,6 +17,27 @@ dotnet restore
 dotnet run
 ```
 
+# Instructions
+This is just the very basic scenario of getting Angular, node-oidc-provider, and a .Net Core API.  I've changed as few lines as possible.  It doesn't even authenticate, it just gives you back whatever you type in the username.  You can type in any name and it will authorize you.  If you look in DevTools, you'll see a call to /me in the Network tab.  That gets all the claims.  There's default example claims.  You don't have to do anything in Angular.  All that matters is the node-oidc-provider/example/support/configuration.js and api/Program.cs files.
+
+Login and click the GetWeather button.
+
+The GetWeather call will return 401.  The debug says:
+
+```
+info: Microsoft.AspNetCore.Authentication.BearerToken.BearerTokenHandler[7]
+      BearerToken was not authenticated. Failure message: Unprotected token failed
+dbug: Microsoft.AspNetCore.Authorization.AuthorizationMiddleware[0]
+      Policy authentication schemes  did not succeed
+info: Microsoft.AspNetCore.Authorization.DefaultAuthorizationService[2]
+      Authorization failed. These requirements were not met:
+      DenyAnonymousAuthorizationRequirement: Requires an authenticated user.
+info: Microsoft.AspNetCore.Authentication.BearerToken.BearerTokenHandler[12]
+      AuthenticationScheme: BearerToken was challenged.
+info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+      Request finished HTTP/1.1 GET http://localhost:5000/WeatherForecast - 401 - - 194.4449ms
+```
+
 # What I've done
 
 git clone https://github.com/panva/node-oidc-provider.git
