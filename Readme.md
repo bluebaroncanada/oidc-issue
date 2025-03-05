@@ -17,8 +17,19 @@ dotnet restore
 dotnet run
 ```
 
+# The two files that matter
+
+All that should matters is the `node-oidc-provider/example/support/configuration.js` and `api/Program.cs` files.  For the client config look at `client/src/app/auth.config.ts` and `client/src/app/app.component.ts`.
+
+```
+builder.Services.AddAuthentication(BearerTokenDefaults.AuthenticationScheme).AddBearerToken(options =>
+{
+    options.ClaimsIssuer = "http://localhost:3000";
+});
+```
+
 # Instructions
-This is just the very basic scenario of getting Angular, node-oidc-provider, and a .Net Core API.  I've changed as few lines as possible.  It doesn't even authenticate, it just gives you back whatever you type in the username.  You can type in any name and it will authorize you.  If you look in DevTools, you'll see a call to /me in the Network tab.  That gets all the claims.  There's default example claims.  You don't have to do anything in Angular.  All that matters is the `node-oidc-provider/example/support/configuration.js` and `api/Program.cs` files.
+This is just the very basic scenario of getting Angular, node-oidc-provider, and a .Net Core API.  I've changed as few lines as possible.  It doesn't even authenticate, it just gives you back whatever you type in the username.  You can type in any name and it will authorize you.  If you look in DevTools, you'll see a call to /me in the Network tab.  That gets all the claims.  There's default example claims.  You don't have to do anything in Angular.
 
 Login and click the GetWeather button.
 
