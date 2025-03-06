@@ -15,6 +15,7 @@ export class AppComponent implements OnInit {
   title = 'client';
   userData: any = null;
   token: string = '';
+  idToken: string = '';
   headers!: HttpHeaders;
 
   constructor(private oidc: OidcSecurityService, private httpClient: HttpClient) {
@@ -26,6 +27,7 @@ export class AppComponent implements OnInit {
       .subscribe((loginResponse: LoginResponse) => {
         const {isAuthenticated, userData, accessToken, idToken, configId} =
           loginResponse;
+        this.idToken = idToken;
         console.log(userData);
         this.userData = userData;
       });
@@ -35,7 +37,7 @@ export class AppComponent implements OnInit {
 
     const token = this.oidc.getAccessToken().subscribe((token) => {
       this.headers = new HttpHeaders({
-        Authorization: 'Bearer ' + token,
+        Authorization: 'Bearer ' + this.idToken,
       });
       this.httpClient.get('http://localhost:5000/WeatherForecast', {headers: this.headers}).subscribe((response: any) => {
         console.log(response);

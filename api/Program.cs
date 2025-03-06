@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Authentication.BearerToken;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,10 +10,23 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 
-builder.Services.AddAuthentication(BearerTokenDefaults.AuthenticationScheme).AddBearerToken(options =>
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
-    options.ClaimsIssuer = "http://localhost:3000";
+    options.Authority = "https://localhost:3000";
+    options.ClaimsIssuer = "https://localhost:3000";
+    options.TokenValidationParameters.ValidateAudience = false;
+    options.TokenValidationParameters = new TokenValidationParameters()
+    {
+        ValidateAudience = false,
+        ValidIssuers = new[] { "http://localhost:3000" },
+        SignatureValidator = delegate (string token, TokenValidationParameters parameters)
+        {
+            var jwt = new Microsoft.IdentityModel.JsonWebTokens.JsonWebToken(token);
+            return jwt;
+        }
+    };
 });
+
 
 var app = builder.Build();
 
