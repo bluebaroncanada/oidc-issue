@@ -17,6 +17,50 @@ dotnet restore
 dotnet run
 ```
 
+# The two files that matter
+
+All that should matter is the `node-oidc-provider/example/support/configuration.js` and `api/Program.cs` files.  For the Angular oidc-client config look at `client/src/app/auth.config.ts` and `client/src/app/app.component.ts`.
+
+`Program.cs`
+```
+builder.Services.AddAuthentication(BearerTokenDefaults.AuthenticationScheme).AddBearerToken(options =>
+{
+    options.ClaimsIssuer = "http://localhost:3000";
+});
+```
+`configuration.js`
+```
+  clients: [
+{
+  client_id: 'oidcCLIENT',
+  token_endpoint_auth_method: 'none',
+  grant_types: ['refresh_token', 'authorization_code'],
+  redirect_uris: ['http://localhost:4200/'],
+  post_logout_redirect_uris: ['http://localhost:4200/'],
+}
+```
+
+# Instructions
+This is just the very basic scenario of getting Angular, node-oidc-provider, and a .Net Core API.  I've changed as few lines as possible.  It doesn't even authenticate, it just gives you back whatever you type in the username.  You can type in any name and it will authorize you.  If you look in DevTools, you'll see a call to /me in the Network tab.  That gets all the claims.  There's default example claims.  You don't have to do anything in Angular.
+
+Login and click the GetWeather button.
+
+The GetWeather call will return 401.  The debug says:
+
+```
+info: Microsoft.AspNetCore.Authentication.BearerToken.BearerTokenHandler[7]
+      BearerToken was not authenticated. Failure message: Unprotected token failed
+dbug: Microsoft.AspNetCore.Authorization.AuthorizationMiddleware[0]
+      Policy authentication schemes  did not succeed
+info: Microsoft.AspNetCore.Authorization.DefaultAuthorizationService[2]
+      Authorization failed. These requirements were not met:
+      DenyAnonymousAuthorizationRequirement: Requires an authenticated user.
+info: Microsoft.AspNetCore.Authentication.BearerToken.BearerTokenHandler[12]
+      AuthenticationScheme: BearerToken was challenged.
+info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+      Request finished HTTP/1.1 GET http://localhost:5000/WeatherForecast - 401 - - 194.4449ms
+```
+
 # What I've done
 
 git clone https://github.com/panva/node-oidc-provider.git
@@ -95,26 +139,16 @@ Add `provideHttpClient()` to `app.config.ts` `providers`
 `app.component.ts`
 
 ```
-  userData: any = null;
-
-  constructor(private oidc: OidcSecurityService, private httpClient: HttpClient) {
-  }
-
-  ngOnInit() {
-    this.oidc
-      .checkAuth()
-      .subscribe((loginResponse: LoginResponse) => {
-        const { isAuthenticated, userData, accessToken, idToken, configId } =
-          loginResponse;
-        console.log(userData);
-        this.userData = userData;
-      });
-  }
-
   getWeather() {
-    this.httpClient.get('http://localhost:5000/WeatherForecast').subscribe((response: any) => {
-      console.log(response);
-    })
+
+    const token = this.oidc.getAccessToken().subscribe((token) => {
+      this.headers = new HttpHeaders({
+        Authorization: 'Bearer ' + token,
+      });
+      this.httpClient.get('http://localhost:5000/WeatherForecast', {headers: this.headers}).subscribe((response: any) => {
+        console.log(response);
+      })
+    });
   }
 ```
 
@@ -132,14 +166,6 @@ Add `provideHttpClient()` to `app.config.ts` `providers`
 # API .Net Core 8 setup
 
 ```
-builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme).AddOpenIdConnect(options =>
-{
-    options.Authority = "http://localhost:3000";
-    options.RequireHttpsMetadata = false;
-    options.ClientId = "oidcCLIENT";
-    options.GetClaimsFromUserInfoEndpoint = true;
-});
-
 builder.Services.AddAuthentication(BearerTokenDefaults.AuthenticationScheme).AddBearerToken(options =>
 {
     options.ClaimsIssuer = "http://localhost:3000";
