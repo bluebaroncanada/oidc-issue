@@ -39,7 +39,7 @@ export class AppComponent implements OnInit {
       this.headers = new HttpHeaders({
         Authorization: 'Bearer ' + this.idToken,
       });
-      this.httpClient.get('http://localhost:5000/WeatherForecast', {headers: this.headers}).subscribe((response: any) => {
+      this.httpClient.get('https://localhost:7025/WeatherForecast', {headers: this.headers}).subscribe((response: any) => {
         console.log(response);
       })
     });
