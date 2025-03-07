@@ -1,10 +1,12 @@
 <main class="main">
   <div class="content">
-    <button (click)="login()">Login</button>
-    <button (click)="logout()">Logout</button>
-    <button (click)="getWeather()">Get Weather</button>
+    <button *ngIf="!userData" (click)="login()">Login</button>
+    <button *ngIf="userData" (click)="logout()">Logout</button>
+    <button *ngIf="userData" (click)="getWeather()">Get Weather</button>
     <ng-container *ngIf="userData">
-      <p>{{ userData.given_name }} {{ userData.family_name }}</p>
+      <p>{{ userData.FirstName }} {{ userData.LastName }}</p>
+      <pre *ngIf="weather">{{weather | json}}</pre>
+      <pre>{{userData | json}}</pre>
     </ng-container>
   </div>
 </main>

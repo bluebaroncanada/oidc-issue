@@ -17,6 +17,7 @@ export class AppComponent implements OnInit {
   token: string = '';
   idToken: string = '';
   headers!: HttpHeaders;
+  weather: any;
 
   constructor(private oidc: OidcSecurityService, private httpClient: HttpClient) {
   }
@@ -40,7 +41,7 @@ export class AppComponent implements OnInit {
         Authorization: 'Bearer ' + this.idToken,
       });
       this.httpClient.get('https://localhost:7025/WeatherForecast', {headers: this.headers}).subscribe((response: any) => {
-        console.log(response);
+        this.weather = response;
       })
     });
   }
