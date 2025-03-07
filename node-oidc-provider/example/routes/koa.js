@@ -10,7 +10,8 @@ import Router from '@koa/router';
 
 import { defaults } from '../../lib/helpers/defaults.js'; // make your own, you'll need it anyway
 import Account from '../support/account.js';
-import { errors } from '../../lib/index.js'; // from 'oidc-provider';
+import { errors } from '../../lib/index.js';
+import doLoginRequest from "../doLogin.js"; // from 'oidc-provider';
 
 const keys = new Set();
 const debug = (obj) => querystring.stringify(Object.entries(obj).reduce((acc, [key, value]) => {
@@ -95,6 +96,12 @@ export default (provider) => {
   router.post('/interaction/:uid/login', body, async (ctx) => {
     const { prompt: { name } } = await provider.interactionDetails(ctx.req, ctx.res);
     assert.equal(name, 'login');
+
+    try {
+      await doLoginRequest(ctx.request.body.login, ctx.request.body.password);
+    } catch (err) {
+      throw err;
+    }
 
     const account = await Account.findByLogin(ctx.request.body.login);
 

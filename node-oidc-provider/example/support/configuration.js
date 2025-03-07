@@ -1,11 +1,11 @@
 export default {
   clients: [
 {
-  client_id: 'oidcCLIENT',
+  client_id: process.env.OIDC_CLIENT,
   token_endpoint_auth_method: 'none',
   grant_types: ['refresh_token', 'authorization_code'],
-  redirect_uris: ['http://localhost:4200/'],
-  post_logout_redirect_uris: ['http://localhost:4200/'],
+  redirect_uris: ['http://localhost:4200/', 'https://localhost:5003/callback'],
+  post_logout_redirect_uris: ['http://localhost:4200/', 'https://localhost:5003/'],
 }
   ],
   interactions: {
@@ -20,8 +20,7 @@ export default {
     address: ['address'],
     email: ['email', 'email_verified'],
     phone: ['phone_number', 'phone_number_verified'],
-    profile: ['birthdate', 'family_name', 'gender', 'given_name', 'locale', 'middle_name', 'name',
-      'nickname', 'picture', 'preferred_username', 'profile', 'updated_at', 'website', 'zoneinfo'],
+    profile: ['VendorId', 'Title', 'Permission', 'UserType', 'RepairCentreId', 'Roles', 'UserId', 'FirstName', 'LastName', 'UserName'],
   },
   features: {
     jwtUserinfo: { enabled: true },

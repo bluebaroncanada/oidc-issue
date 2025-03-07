@@ -1,0 +1,185 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model MigrationHistory {
+  MigrationId    String @db.NVarChar(150)
+  ContextKey     String @db.NVarChar(300)
+  Model          Bytes
+  ProductVersion String @db.NVarChar(32)
+
+  @@id([MigrationId, ContextKey], map: "PK_dbo.__MigrationHistory")
+  @@map("__MigrationHistory")
+}
+
+model Applications {
+  ApplicationId          Int                      @id(map: "PK_Application") @default(autoincrement())
+  Label                  String                   @db.VarChar(50)
+  AspNetPermissionGroups AspNetPermissionGroups[]
+}
+
+model AspNetPermissionGroups {
+  Id                String              @id(map: "PK_PermissionGroups") @default("newid()", map: "DF_PermissionGroups_Id") @db.NVarChar(128)
+  ApplicationId     Int
+  Name              String              @db.NVarChar(256)
+  Applications      Applications        @relation(fields: [ApplicationId], references: [ApplicationId], onDelete: Cascade, onUpdate: NoAction, map: "FK_AspNetPermissionGroups_Applications")
+  AspNetPermissions AspNetPermissions[]
+}
+
+model AspNetPermissions {
+  Id                     String                 @id(map: "PK_ApplicationPermission") @default("newid()", map: "DF_AspNetPermissions_Id") @db.NVarChar(128)
+  PermissionGroupId      String                 @db.NVarChar(128)
+  Name                   String                 @db.NVarChar(256)
+  AspNetPermissionGroups AspNetPermissionGroups @relation(fields: [PermissionGroupId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_AspNetPermissions_AspNetPermissionGroups")
+}
+
+model AspNetRoleGroups {
+  Id          String        @id(map: "PK_AspNetRoleGroups_1") @default("newid()", map: "DF_AspNetRoleGroups_Id") @db.NVarChar(128)
+  Name        String        @db.NVarChar(256)
+  AspNetRoles AspNetRoles[]
+}
+
+model AspNetRoles {
+  Id               String            @id(map: "PK_dbo.AspNetRoles") @default("newid()", map: "DF_AspNetRoles_Id") @db.NVarChar(128)
+  RoleGroupId      String            @db.NVarChar(128)
+  Label            String?           @db.NVarChar(256)
+  Name             String            @unique(map: "RoleNameIndex") @db.NVarChar(256)
+  Ordinal          Int
+  AspNetRoleGroups AspNetRoleGroups  @relation(fields: [RoleGroupId], references: [Id], onUpdate: NoAction, map: "FK_AspNetRoles_AspNetRoleGroups")
+  AspNetUserRoles  AspNetUserRoles[]
+}
+
+model AspNetTitleGroups {
+  Id           String         @id(map: "PK_AspNetTitleTypes") @default("newid()", map: "DF_AspNetTitleGroups_Id") @db.NVarChar(128)
+  Name         String         @db.NVarChar(256)
+  AspNetTitles AspNetTitles[]
+}
+
+model AspNetTitles {
+  Id                String            @id(map: "PK_AspNetTitles") @default("newid()", map: "DF_AspNetTitles_Id") @db.NVarChar(128)
+  TitleGroupId      String            @db.NVarChar(128)
+  Name              String            @db.VarChar(256)
+  AspNetTitleGroups AspNetTitleGroups @relation(fields: [TitleGroupId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_AspNetTitles_AspNetTitleGroups")
+}
+
+model AspNetUserClaims {
+  Id          Int         @id(map: "PK_dbo.AspNetUserClaims") @default(autoincrement())
+  UserId      String      @db.NVarChar(128)
+  ClaimType   String?     @db.NVarChar(Max)
+  ClaimValue  String?     @db.NVarChar(Max)
+  AspNetUsers AspNetUsers @relation(fields: [UserId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_dbo.AspNetUserClaims_dbo.AspNetUsers_UserId")
+
+  @@index([UserId], map: "IX_UserId")
+}
+
+model AspNetUserLoginHistory {
+  AspNetUserLoginHistoryId Int      @id(map: "PK_AspNetUserLoginHistory") @default(autoincrement())
+  IPAddress                String   @db.VarChar(50)
+  CreatedDate              DateTime @db.DateTime
+  Success                  Boolean
+  LoginSuccessFailureCode  String   @db.VarChar(10)
+  Email                    String   @db.NVarChar(255)
+}
+
+model AspNetUserLogins {
+  LoginProvider String      @db.NVarChar(128)
+  ProviderKey   String      @db.NVarChar(128)
+  UserId        String      @db.NVarChar(128)
+  AspNetUsers   AspNetUsers @relation(fields: [UserId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_dbo.AspNetUserLogins_dbo.AspNetUsers_UserId")
+
+  @@id([LoginProvider, ProviderKey, UserId], map: "PK_dbo.AspNetUserLogins")
+  @@index([UserId], map: "IX_UserId")
+}
+
+model AspNetUserRoles {
+  UserId      String      @db.NVarChar(128)
+  RoleId      String      @db.NVarChar(128)
+  AspNetRoles AspNetRoles @relation(fields: [RoleId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_dbo.AspNetUserRoles_dbo.AspNetRoles_RoleId")
+  AspNetUsers AspNetUsers @relation(fields: [UserId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_dbo.AspNetUserRoles_dbo.AspNetUsers_UserId")
+
+  @@id([UserId, RoleId], map: "PK_dbo.AspNetUserRoles")
+  @@index([RoleId], map: "IX_RoleId")
+  @@index([UserId], map: "IX_UserId")
+}
+
+model AspNetUsers {
+  Id                   String             @id(map: "PK_dbo.AspNetUsers") @db.NVarChar(128)
+  FirstName            String?            @db.NVarChar(Max)
+  LastName             String?            @db.NVarChar(Max)
+  Email                String?            @db.NVarChar(256)
+  EmailConfirmed       Boolean
+  PasswordHash         String?            @db.NVarChar(Max)
+  SecurityStamp        String?            @db.NVarChar(Max)
+  PhoneNumber          String?            @db.NVarChar(Max)
+  PhoneNumberConfirmed Boolean
+  TwoFactorEnabled     Boolean
+  LockoutEndDateUtc    DateTime?          @db.DateTime
+  LockoutEnabled       Boolean
+  AccessFailedCount    Int
+  UserName             String?            @unique(map: "UserNameIndex") @db.NVarChar(256)
+  isDisabled           Boolean            @default(false, map: "DF__AspNetUse__isDis__403A8C7D")
+  isArchived           Boolean            @default(false, map: "DF__AspNetUse__isArc__412EB0B6")
+  DateCreated          DateTime           @default(dbgenerated("1900-01-01T00:00:00.000"), map: "DF__AspNetUse__DateC__4222D4EF") @db.DateTime
+  DateModified         DateTime?          @db.DateTime
+  NormalizedUserName   String?            @db.NVarChar(256)
+  NormalizedEmail      String?            @db.NVarChar(256)
+  LockoutEnd           DateTime?          @db.DateTime
+  ConcurrencyStamp     String?            @db.NVarChar(256)
+  AspNetUserClaims     AspNetUserClaims[]
+  AspNetUserLogins     AspNetUserLogins[]
+  AspNetUserRoles      AspNetUserRoles[]
+}
+
+model AspNetUsers_SPTemp {
+  Id                   String    @id(map: "PK_dbo.AspNetUsers_SPTemp") @db.NVarChar(128)
+  FirstName            String?   @db.NVarChar(Max)
+  LastName             String?   @db.NVarChar(Max)
+  Email                String?   @db.NVarChar(256)
+  EmailConfirmed       Boolean
+  PasswordHash         String?   @db.NVarChar(Max)
+  SecurityStamp        String?   @db.NVarChar(Max)
+  PhoneNumber          String?   @db.NVarChar(Max)
+  PhoneNumberConfirmed Boolean
+  TwoFactorEnabled     Boolean
+  LockoutEndDateUtc    DateTime? @db.DateTime
+  LockoutEnabled       Boolean
+  AccessFailedCount    Int
+  UserName             String    @unique(map: "UserNameIndex") @db.NVarChar(256)
+  isDisabled           Boolean   @default(false, map: "DF__AspNetUse__isDis__F7E16FF2")
+  isArchived           Boolean   @default(false, map: "DF__AspNetUse__isArc__C9276B79")
+  DateCreated          DateTime  @default(dbgenerated("1900-01-01T00:00:00.000"), map: "DF__AspNetUse__DateC__4773FC6D") @db.DateTime
+  DateModified         DateTime? @db.DateTime
+  Tested               Boolean?
+  Flagged              Boolean?
+}
+
+model AspNetUserTitles {
+  AspNetUserTitleId Int    @id(map: "PK_AspNetUserTitle") @default(autoincrement())
+  Label             String @db.VarChar(50)
+}
+
+model AspNetUserTypes {
+  Id   String @id(map: "PK_AspNetUserTypes_1") @db.NVarChar(128)
+  Name String @db.NVarChar(256)
+}
+
+model Audience {
+  ClientId     String @id(map: "PK_Audience") @db.NVarChar(32)
+  Base64Secret String @db.NVarChar(80)
+  Name         String @db.VarChar(100)
+}
+
+model sysdiagrams {
+  name         String @db.NVarChar(128)
+  principal_id Int
+  diagram_id   Int    @id(map: "PK__sysdiagr__C2B05B617FB602B9") @default(autoincrement())
+  version      Int?
+  definition   Bytes?
+
+  @@unique([principal_id, name], map: "UK_principal_name")
+}
